@@ -1,0 +1,130 @@
+using @@error   
+
+CREATE PROCEDURE spSellProduct
+s
+@ProductId INT,
+
+@QuantityToSell INT
+
+AS BEGIN
+
+DECLARE @StockAvailable INT
+
+SELECT @StockAvailable =QtyAvailable FROM tblProduct WHERE Productid =@productId
+
+ 
+
+if (@stockAvailable< @QuantityToSell)
+ 
+BEGIN
+
+RAISERROR('Not Enough Stock Available', 16, 1);
+
+END
+
+else
+BEGIN
+
+BEGIN TRAN
+update  tblproduct
+
+SET Qtyavailable =(QtyAvailable-@QuantityToSell)  where Productid = @ProductId;
+
+declare @maxProductSalesid int
+
+SELECT @maxProductSalesid = CASE WHEN MAX( ProductSalesid) IS NULL THEN 0 else max(ProductsalesId) END 
+FROM tblProductSales
+
+
+
+SET @MaxProductSalesid = @MaxProductsalesid + 1
+
+INSERT INTO tblProductSales VALUES (@maxProductSalesid, @ProductId, @QuantityTosell)
+
+if (@@error !=0)
+
+rollback Tran
+
+else
+
+commit tran 
+
+end
+
+end
+
+
+select * from tblproduct;
+s
+elect * from tblProductSales;
+
+spSellProducts 1, 5;
+
+
+
+using try catch block
+
+ALTER PROCEDURE spSellProduct
+s
+@ProductId INT,
+
+@QuantityToSell INT
+
+AS BEGIN
+
+DECLARE @StockAvailable INT
+
+SELECT @StockAvailable =QtyAvailable FROM tblProduct WHERE Productid =@productId
+
+ 
+
+if (@stockAvailable< @QuantityToSell)
+ 
+BEGIN
+
+RAISERROR('Not Enough Stock Available', 16, 1);
+
+END
+
+else
+BEGIN
+
+Begin try
+
+BEGIN TRAN
+update  tblproduct
+
+SET Qtyavailable =(QtyAvailable-@QuantityToSell)  where Productid = @ProductId;
+
+declare @maxProductSalesid int
+
+SELECT @maxProductSalesid = CASE WHEN MAX( ProductSalesid) IS NULL THEN 0 else max(ProductsalesId) END 
+FROM tblProductSales
+
+
+
+SET @MaxProductSalesid = @MaxProductsalesid + 1
+
+INSERT INTO tblProductSales VALUES (@maxProductSalesid, @ProductId, @QuantityTosell)
+
+commit tran 
+
+end try
+ 
+begin catch
+
+rollback Tran
+
+end catch
+
+end
+
+end
+
+
+select * from tblproduct;
+
+select * from tblProductSales;
+
+
+spSellProducts 1, 10;
